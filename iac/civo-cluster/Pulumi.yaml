@@ -1,0 +1,27 @@
+name: civo-cluster
+runtime: yaml
+description: The Civo Cluster for the demo
+
+outputs:
+  clusterName: ${cluster.name}
+  kubeconfig: ${cluster.kubeconfig}
+
+resources:
+  cluster:
+    properties:
+      firewallId: ${firewall.id}
+      name: backstageDemoCluster
+      region: LON1
+      cni: cilium
+      applications: "-traefik2-nodeport,civo-cluster-autoscaler,traefik2-loadbalancer"
+      kubernetesVersion: 1.28.7-k3s1
+      pools:
+        size: g4s.kube.medium
+        nodeCount: 1
+    type: civo:KubernetesCluster
+  firewall:
+    properties:
+      createDefaultRules: true
+      name: backstageDemoFirewall
+      region: LON1
+    type: civo:Firewall
