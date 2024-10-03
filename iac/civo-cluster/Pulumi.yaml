@@ -10,11 +10,11 @@ resources:
   cluster:
     properties:
       firewallId: ${firewall.id}
-      name: backstageDemoCluster
       region: LON1
       cni: cilium
       applications: "-traefik2-nodeport,civo-cluster-autoscaler,traefik2-loadbalancer"
       kubernetesVersion: 1.28.7-k3s1
+      writeKubeconfig: true
       pools:
         size: g4s.kube.medium
         nodeCount: 1
@@ -22,6 +22,5 @@ resources:
   firewall:
     properties:
       createDefaultRules: true
-      name: backstageDemoFirewall
       region: LON1
     type: civo:Firewall

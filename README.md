@@ -1,65 +1,88 @@
+# Build Your Developer Platform in 90 Minutes - Backstage + ArgoCD + K8s
+
+This repository contains everything you need to follow along with the "Build Your Developer Platform in 90 Minutes -
+Backstage + ArgoCD + K8s" workshop during [DevOpsDays TLV 2024](https://tlvcommunity.dev/devopsdays/agenda-2024).
+
+The main goal of this workshop is to show how to build a developer platform using `Backstage`, `ArgoCD`, and `Kubernetes` and give you a glimpse of how this tools work and how you can use these tools to build your own developer platform.
+
+## Repository
+
+Please fork this repository to your own GitHub account to follow along with the workshop. You can do this by clicking on this link:
+
+[![Fork this repository](https://img.shields.io/badge/Fork-this%20repository-orange?logo=github&style=for-the-badge)](https://github.com/dirien/backstage-demo/fork)
+
+This repository contains all the resources that are needed to follow along with the workshop. Additionally, it contains a `.devcontainer` configuration that allows you to run the workshop in a containerized environment. You can choose from several options to run the workshop:
+
+1. **Local Environment**: You can run the workshop on your local machine.
+1. **GitHub Codespaces**: You can run the workshop in a GitHub Codespace.
+
+### `.devcontainer` Configuration
+
+The `.devcontainer` configuration is used to create a containerized environment for the workshop. It contains all the tools and dependencies that are needed to run the workshop.
+
+All you need to do is, after forking the repository, decide what remote environment you want to use. 
+
+#### GitHub Codespaces
+
+If you prefer to use `GitHub Codespaces` you can click on the `Code` button in the top right corner of the repository and select `Open with Codespaces`. If you prefer to use a local environment you can follow the instructions below.
+
+<img src="img/codespace.png">
+
+#### Local Environment
+
+First, you need to clone the repository to your local machine:
+
+```bash
+git clone <your-forked-repository URL>
+```
+
+And you need to have on your local machine Visual Studio Code and the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) from the Visual Studio Code Marketplace installed.
+
 ## Prerequisites
 
-* Install `gum` by following the instructions in https://github.com/charmbracelet/gum#installation.
-* Watch https://youtu.be/U8zCHA-9VLA if you are not familiar with Charm Gum.
+Before you start the workshop, make sure you have the following tools installed on your machine:
 
-## Create Clusters
+> **Note**: We highly recommend using the `.devcontainer` configuration to run the workshop as you do not need to
+> install any of the tools below.
 
-```bash
-chmod +x clusters.sh
+| Name       | Required | More info                                                  |
+|------------|----------|------------------------------------------------------------|
+| civo CLI   | No       | https://github.com/civo/cli\                               |
+| Pulumi CLI | Yes      | https://www.pulumi.com/docs/iac/download-install/\         |
+| gitHub CLI | Yes      | https://cli.github.com/                                    |
+| yq         | Yes      | https://github.com/mikefarah/yq#install                    |
+| kubeseal   | Yes      | https://github.com/bitnami-labs/sealed-secrets#kubeseal    |
+| Helm       | Yes      | https://github.com/helm/helm#install                       |
+| kubectl    | Yes      | https://github.com/kubernetes/kubectl                      |
+| argocd-cli | Yes      | https://argo-cd.readthedocs.io/en/stable/cli_installation/ |
 
-# TODO: Send emails to the attendees with the instructions how to
-#   use the clusters and the tools that should be installed.
-./clusters.sh
-```
+### Pulumi Account
 
-## Demo Setup
+As part of the Pulumi CLI installation, you will need to create a free Pulumi account to host your state files. Please
+head over to [Pulumi](https://app.pulumi.com/signup) and create your free personal account.
 
-* Install `gum` by following the instructions in https://github.com/charmbracelet/gum#installation.
-* Watch https://youtu.be/U8zCHA-9VLA if you are not familiar with Charm Gum.
+### Civo Account (Optional)
 
-```bash
-chmod +x setup.sh
+We will be using [Civo](https://www.civo.com/) as our Kubernetes provider. If you want you can create
+a [Civo account](https://dashboard.civo.com/signup) with a free $250 credit to use for the workshop.
 
-./setup.sh
+Otherwise, we will provider you an API key to use for the workshop, this will be provided during the workshop.
 
-source .env
-```
+> **Note**: After the workshop, we will delete all the resources created during the workshop to avoid any charges. If you want to keep the resources please use your own Civo account.
 
-## Create Your Own Backstage Component
+## Workshop
 
-1. Copy the `users-api/users-app-component.yaml` to `/catalog`
-``` bash
-cp users-api/users-app-component.yaml to catalog/new-app.yaml
-```
-2. Edit the `catalog/new-app.yaml` based on the component configuration 
-3. Add an Entry to `/catalog/catalog-all.yaml`
-```
-    - ./new-app.yaml
-```
-4. Create a relation between to components, by adding the following configuration to one of the components - [example](https://github.com/backstage/backstage/blob/658a41574809707c902ae00ec6da13da66905d52/packages/catalog-model/examples/components/artist-lookup-component.yaml#L38).
-```
-spec:
-  dependsOn: ['component:db']
-```
-5. Add links to component by adding the following configuration - [example](https://github.com/backstage/backstage/blob/658a41574809707c902ae00ec6da13da66905d52/packages/catalog-model/examples/components/artist-lookup-component.yaml#L9)
-```
-metadata:
-  links:
-  -  url: https://example.com/user
-     title: Examples Users
-     icon: user
-```
+The workshop is divided into several steps. For each step, we created separate shell scripts that you can run to get the desired result. The steps are as follows:
 
-## Destroy Clusters
+1. Create Cluster
+2. Set up the Environment
+3. Run the actual demo
+4. Cleanup
 
-* Install `gum` by following the instructions in https://github.com/charmbracelet/gum#installation.
-* Watch https://youtu.be/U8zCHA-9VLA if you are not familiar with Charm Gum.
+## Troubleshooting Tips
 
-```bash
-chmod +x setup.sh
+If you encounter any challenges during the workshops, consider the following steps in order:
 
-./setup.sh
-
-source .env
-```
+1. Don't hesitate to reach out to us! We are here to assist and get you back on track.
+1. Review the example code available [here](https://github.com/dirien/backstage-demo.git).
+1. Search for the error on Google. Honestly, this method often provides the most insightful solutions.

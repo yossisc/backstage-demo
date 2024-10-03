@@ -8,10 +8,21 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://github.com/dirien/backstage-demo
-    targetRevision: HEAD
-    path: backstage-resources
+  sources:
+    - repoURL: https://github.com/dirien/backstage-demo
+      targetRevision: HEAD
+      path: backstage-resources
+      directory:
+        include: 'bs-*.yaml'
+    - repoURL: https://github.com/my-silly-organisation/backstage.git
+      targetRevision: main
+      path: backstage-umbrella
+      helm:
+        valueFiles:
+          - $values/backstage-resources/helm-values.yaml
+    - repoURL: https://github.com/dirien/backstage-demo
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: backstage

@@ -86,14 +86,14 @@ kubectl --namespace backstage \
     --from-literal GITHUB_TOKEN=$GITHUB_TOKEN \
     --from-literal ARGOCD_AUTH_TOKEN=$ARGOCD_AUTH_TOKEN_ENCODED \
     --dry-run=client --output yaml \
-    | kubeseal --controller-namespace kubeseal \
-    | tee backstage-resources/bs-secret.json
+    | kubeseal --controller-namespace kubeseal --format yaml \
+    | tee backstage-resources/bs-secret.yaml
 
 cat argocd/backstage.yaml
 
-yq --inplace \
-    ".spec.rules[0].host = \"backstage.$INGRESS_HOST.nip.io\"" \
-    backstage-resources/bs-ingress.yaml
+#yq --inplace \
+#    ".spec.rules[0].host = \"backstage.$INGRESS_HOST.nip.io\"" \
+#    backstage-resources/bs-ingress.yaml
 
 cp argocd/backstage.yaml infra/.
 

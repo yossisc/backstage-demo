@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 rm -f .env
 
 cp iac/civo-cluster/.env .
+
+source .env
 
 gum style \
         --foreground 212 --border-foreground 212 --border double \
@@ -48,7 +50,9 @@ Do you have those tools installed?
 
 #echo "export GITHUB_ORG=$GITHUB_ORG" >> .env
 
-echo "export GITHUB_ORG=dirien" >> .env
+#echo "export GITHUB_ORG=dirien" >> .env
+GITHUB_ORG=$(gum input --placeholder "Which GitHub organization/user do you want to use?" --value "GITHUB_ORG" --password)
+echo "export GITHUB_ORG=$GITHUB_ORG" >>  .env
 
 #cd backstage-demo
 
@@ -82,7 +86,11 @@ yq --inplace \
     argocd/users-api.yaml
 
 yq --inplace \
-    ".spec.source.repoURL = \"https://github.com/$GITHUB_ORG/backstage-demo\"" \
+    ".spec.sources[0].repoURL = \"https://github.com/$GITHUB_ORG/backstage-demo\"" \
+    argocd/backstage.yaml
+
+yq --inplace \
+    ".spec.sources[2].repoURL = \"https://github.com/$GITHUB_ORG/backstage-demo\"" \
     argocd/backstage.yaml
 
 gum style \
@@ -102,19 +110,35 @@ gum style \
 GITHUB_TOKEN=$(gum input --placeholder "GitHub token" --value "$GITHUB_TOKEN" --password)
 echo "export GITHUB_TOKEN=$GITHUB_TOKEN" >> .env
 
+#yq --inplace \
+#    ".data.ARGOCD_URL = \"http://argocd.$INGRESS_HOST.nip.io/api/v1/\"" \
+#    backstage-resources/bs-config.yaml
+
 yq --inplace \
-    ".data.ARGOCD_URL = \"http://argocd.$INGRESS_HOST.nip.io/api/v1/\"" \
-    backstage-resources/bs-config.yaml
-    
+    ".backstage.backstage.extraEnvVars |= map(select(.name == \"ARGOCD_URL\").value = \"http://argocd.$INGRESS_HOST.nip.io/api/v1/\")" \
+    backstage-resources/helm-values.yaml
+
+#yq --inplace \
+#    ".data.CATALOG_LOCATION = \"https://github.com/$GITHUB_ORG/backstage-demo/blob/main/catalog/catalog-all.yaml\"" \
+#    backstage-resources/bs-config.yaml
+
 yq --inplace \
-    ".data.CATALOG_LOCATION = \"https://github.com/$GITHUB_ORG/backstage-demo/blob/main/catalog/catalog-all.yaml\"" \
-    backstage-resources/bs-config.yaml
+    ".backstage.backstage.extraEnvVars |= map(select(.name == \"CATALOG_LOCATION\").value = \"https://github.com/$GITHUB_ORG/backstage-demo/blob/main/catalog/catalog-all.yaml\")" \
+    backstage-resources/helm-values.yaml
 
 export BACKSTAGE_URL="backstage.$INGRESS_HOST.nip.io"
 echo "export BACKSTAGE_URL=$BACKSTAGE_URL" >> .env
 
-yq --inplace ".data.BASE_URL = \"$BACKSTAGE_URL\"" \
-    backstage-resources/bs-config.yaml
+#yq --inplace ".data.BASE_URL = \"$BACKSTAGE_URL\"" \
+#    backstage-resources/bs-config.yaml
+
+yq --inplace \
+    ".backstage.ingress.host = \"$BACKSTAGE_URL\"" \
+    backstage-resources/helm-values.yaml
+
+yq --inplace \
+    ".backstage.backstage.extraEnvVars |= map(select(.name == \"BASE_URL\").value = \"$BACKSTAGE_URL\")" \
+    backstage-resources/helm-values.yaml
 
 echo "
 Deploying ArgoCD
@@ -154,6 +178,8 @@ export ARGOCD_AUTH_TOKEN=$(argocd account generate-token \
 
 export ARGOCD_AUTH_TOKEN_ENCODED="argocd.token=$ARGOCD_AUTH_TOKEN"
 echo "export ARGOCD_AUTH_TOKEN_ENCODED=$ARGOCD_AUTH_TOKEN_ENCODED" >> .env
+
+echo "export ARGOCD_URL=http://argocd.$INGRESS_HOST.nip.io" >> .env
 
 echo "
 Setup Done!
