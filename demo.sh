@@ -137,8 +137,8 @@ cat users-api/users-app-component.yaml
 
 cp users-api/users-app-component.yaml catalog/
 
-yq  --inplace \
-    ".spec.targets += \"./users-app-component.yaml\"" \
+yq --inplace \
+    ".spec.targets += [\"./users-app-component.yaml\"]" \
     catalog/catalog-all.yaml
 
 git add catalog

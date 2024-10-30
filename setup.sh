@@ -51,7 +51,7 @@ Do you have those tools installed?
 #echo "export GITHUB_ORG=$GITHUB_ORG" >> .env
 
 #echo "export GITHUB_ORG=dirien" >> .env
-GITHUB_ORG=$(gum input --placeholder "Which GitHub organization/user do you want to use?" --value "GITHUB_ORG" --password)
+GITHUB_ORG=$(gum input --placeholder "Which GitHub organization/user do you want to use?" --value "GITHUB_ORG")
 echo "export GITHUB_ORG=$GITHUB_ORG" >>  .env
 
 #cd backstage-demo
@@ -59,6 +59,17 @@ echo "export GITHUB_ORG=$GITHUB_ORG" >>  .env
 #export INGRESS_CLASS=$(kubectl get ingressclasses \
 #    --output jsonpath="{.items[0].metadata.name}")
 #echo "export INGRESS_CLASS=$INGRESS_CLASS" >> .env
+
+#WORKAROUND: Because of an issue with Civo to install Traefik as part of the cluster creation, we need to install it manually
+kubectl apply -f https://raw.githubusercontent.com/civo/kubernetes-marketplace/refs/heads/master/traefik2-loadbalancer/app.yaml
+
+ip=""
+while [ -z $ip ]; do
+  echo "Waiting for external IP"
+  ip=$(kubectl get svc traefik --namespace kube-system --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
+  [ -z "$ip" ] && sleep 10
+done
+echo 'Found external IP: '$ip
 
 export INGRESS_HOST=$(\
     kubectl --namespace kube-system get service traefik \

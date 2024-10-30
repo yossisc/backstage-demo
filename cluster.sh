@@ -59,5 +59,5 @@ kubectl get nodes
 echo ""
 
 echo "
--> Head over to the next chapter by running the \`./demo.sh\` script
+-> Head over to the next chapter by running the \`./setup.sh\` script
 " | gum format
